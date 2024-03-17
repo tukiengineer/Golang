@@ -1,7 +1,6 @@
 package main
 
 import (
-	"container/list"
 	"net/http"
 
 	"strconv"
@@ -40,7 +39,19 @@ func main() {
 	})
 
 	e.PATCH("/users/:id", func(c echo.Context) error {
+		u := new(User)
+		if err := c.Bind(u); err != nil {
+			return err
+		}
+		id, _ := strconv.Atoi(c.Param("id"))
+		users[id].Name = u.Name
+		return c.JSON(http.StatusOK, users[id])
+	})
 
+	e.DELETE("/users/:id", func(c echo.Context) error {
+		id, _ := strconv.Atoi(c.Param("id"))
+		delete(users, id)
+		return c.NoContent(http.StatusNoContent)
 	})
 
 	e.Logger.Fatal(e.Start(":2205"))
