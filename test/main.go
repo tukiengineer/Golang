@@ -1,9 +1,47 @@
 package main
 
 import (
-	"fmt"
+	"container/list"
+	"net/http"
+
+	"strconv"
+
+	"github.com/labstack/echo/v4"
+)
+
+type User struct {
+	ID   int    `json:"ID"`
+	Name string `json:"name"`
+}
+
+var (
+	users = map[int]*User{}
+	seq   = 1
 )
 
 func main() {
-	fmt.Println("Hello world!")
+	e := echo.New()
+
+	e.POST("/users", func(c echo.Context) error {
+		u := &User{
+			ID: seq,
+		}
+		if err := c.Bind(u); err != nil {
+			return err
+		}
+		users[u.ID] = u
+		seq++
+		return c.JSON(http.StatusCreated, u)
+	})
+
+	e.GET("/users/:id", func(c echo.Context) error {
+		id, _ := strconv.Atoi(c.Param("id"))
+		return c.JSON(http.StatusOK, users[id])
+	})
+
+	e.PATCH("/users/:id", func(c echo.Context) error {
+
+	})
+
+	e.Logger.Fatal(e.Start(":2205"))
 }
