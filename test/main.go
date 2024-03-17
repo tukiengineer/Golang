@@ -15,7 +15,7 @@ type User struct {
 
 var (
 	users = map[int]*User{}
-	seq   = 1
+	count = 1
 )
 
 func main() {
@@ -23,13 +23,13 @@ func main() {
 
 	e.POST("/users", func(c echo.Context) error {
 		u := &User{
-			ID: seq,
+			ID:	count,
 		}
 		if err := c.Bind(u); err != nil {
 			return err
 		}
 		users[u.ID] = u
-		seq++
+		count++
 		return c.JSON(http.StatusCreated, u)
 	})
 
